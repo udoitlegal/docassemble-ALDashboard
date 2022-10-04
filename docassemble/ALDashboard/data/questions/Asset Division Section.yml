@@ -1,0 +1,1051 @@
+modules:
+  - docassemble.base.util
+  - .ThreePartsDate
+  - .PhoneNumberDataType
+---
+features:
+  navigation: True
+  progress bar: True
+  javascript:
+    - intlTelInput-jquery.min.js
+    - intlTelInput-jquery.js
+    - intlTelInput.js
+    - phone-number-validation.js
+  css:
+    - intlTelInput.min.css
+    - phone-number-validator.css
+---
+imports:
+  - statistics
+---
+code: |
+  from itertools import chain
+  from docassemble.base.functions import alpha, roman, item_label, comma_and_list, get_language, set_language, get_dialect, set_country, get_country, word, comma_list, ordinal, ordinal_number, need, nice_number, quantity_noun, possessify, verb_past, verb_present, noun_plural, noun_singular, space_to_underscore, force_ask, force_gather, period_list, name_suffix, currency, indefinite_article, nodoublequote, capitalize, title_case, url_of, do_you, did_you, does_a_b, did_a_b, your, her, his, is_word, get_locale, set_locale, process_action, url_action, get_info, set_info, get_config, prevent_going_back, qr_code, action_menu_item, from_b64_json, defined, value, message, response, json_response, command, single_paragraph, quote_paragraphs, location_returned, location_known, user_lat_lon, interview_url, interview_url_action, interview_url_as_qr, interview_url_action_as_qr, interview_email, get_emails, get_default_timezone, user_logged_in, interface, user_privileges, user_has_privilege, user_info, action_arguments, action_argument, background_action, background_response, background_response_action, background_error_action, us, set_live_help_status, chat_partners_available, phone_number_in_e164, phone_number_formatted, phone_number_is_valid, countries_list, country_name, write_record, read_records, delete_record, variables_as_json, all_variables, language_from_browser, device, plain, bold, italic, states_list, state_name, subdivision_type, indent, raw, fix_punctuation, set_progress, get_progress, referring_url, undefine, invalidate, dispatch, yesno, noyes, split, showif, showifdef, phone_number_part, set_parts, log, encode_name, decode_name, interview_list, interview_menu, server_capabilities, session_tags, get_chat_log, get_user_list, get_user_info, set_user_info, get_user_secret, create_user, create_session, get_session_variables, set_session_variables, get_question_data, go_back_in_session, manage_privileges, redact, forget_result_of, re_run_logic, reconsider, set_title, set_save_status, single_to_double_newlines, verbatim, add_separators, store_variables_snapshot, update_terms
+  from docassemble.base.util import LatitudeLongitude, RoleChangeTracker, Name, IndividualName, Address, City, Event, Person, Thing, Individual, ChildList, FinancialList, PeriodicFinancialList, Income, Asset, Expense, Value, PeriodicValue, OfficeList, Organization, send_email, send_sms, send_fax, map_of, last_access_time, last_access_delta, last_access_days, last_access_hours, last_access_minutes, returning_user, timezone_list, as_datetime, current_datetime, date_difference, date_interval, today, month_of, day_of, dow_of, year_of, format_date, format_datetime, format_time, DARedis, DACloudStorage, DAGoogleAPI, SimpleTextMachineLearner, ocr_file, ocr_file_in_background, read_qr, get_sms_session, initiate_sms_session, terminate_sms_session, path_and_mimetype, run_python_module, pdf_concatenate, include_docx_template, start_time, zip_file, validation_error, DAValidationError, action_button_html, url_ask, overlay_pdf, DAStore, explain, clear_explanations, explanation, set_status, get_status, DAWeb, DAWebError, json, re, iso_country, assemble_docx, docx_concatenate, task_performed, task_not_yet_performed, mark_task_as_performed, times_task_performed, set_task_counter, stash_data, retrieve_stashed_data, DABreadCrumbs, DAOAuth, DAObject, DAList, DADict, DAOrderedDict, DASet, DAFile, DAFileCollection, DAFileList, DAStaticFile, DAEmail, DAEmailRecipient, DAEmailRecipientList, DATemplate, DAEmpty, DALink, selections, objects_from_file, RelationshipTree, DAContext
+---
+objects:
+  - pet: Individual
+  - resp: Individual
+  - realestate: DAList.using(object_type=Thing)
+  - furniture: DAList.using(object_type=Thing)
+  - collectibles: DAList.using(object_type=Thing)
+  - vehicles: DAList.using(object_type=Thing)
+  - savingsaccounts: DAList.using(object_type=Thing)
+  - checkingaccounts: DAList.using(object_type=Thing)
+  - creditunion: DAList.using(object_type=Thing)
+  - cash: DAList.using(object_type=Thing)
+  - taxrefund: DAList.using(object_type=Thing)
+  - lifeinsurance: DAList.using(object_type=Thing)
+  - brokerageaccounts: DAList.using(object_type=Thing)
+  - retirementplans: DAList.using(object_type=Thing)
+  - profitsharingplans: DAList.using(object_type=Thing)
+  - moneyowed: DAList.using(object_type=Thing)
+  - businesses: DAList.using(object_type=Thing)
+  - otherassets: DAList.using(object_type=Thing)
+  - studentloans: DAList.using(object_type=Thing)
+  - taxes: DAList.using(object_type=Thing)
+  - arrearages: DAList.using(object_type=Thing)
+  - unsecuredloans: DAList.using(object_type=Thing)
+  - creditcards: DAList.using(object_type=Thing)
+  - otherdebts: DAList.using(object_type=Thing)
+  - debtsandliens: DAList.using(object_type=Thing)
+  - householdmembers: DAList.using(ask_number=True, object_type=Individual)
+  - posattachments: DAList.using(auto_gather=False)
+  - forms: DAList.using(auto_gather=False)
+  - paysattorneysfees: Thing
+---
+mandatory: true
+code: |
+	pet.name.first
+	resp.name.first
+	
+	propertydivision_info1
+  propertydivision_info2
+  propertydivision_info3
+  
+  realestate.there_are_any
+  if realestate.there_are_any:
+    realestate.gather()
+  furniture.there_are_any
+  if furniture.there_are_any:
+    furniture.gather()
+  collectibles.there_are_any
+  if collectibles.there_are_any:
+    collectibles.gather()
+  vehicles.there_are_any
+  if vehicles.there_are_any:
+    vehicles.gather()
+  savingsaccounts.there_are_any
+  if savingsaccounts.there_are_any:
+    savingsaccounts.gather()
+  checkingaccounts.there_are_any
+  if checkingaccounts.there_are_any:
+    checkingaccounts.gather()
+  creditunion.there_are_any
+  if creditunion.there_are_any:
+    creditunion.gather()
+  cash.there_are_any
+  if cash.there_are_any:
+    cash.gather()
+  taxrefund.there_are_any
+  if taxrefund.there_are_any:
+    taxrefund.gather()
+  lifeinsurance.there_are_any
+  if lifeinsurance.there_are_any:
+    lifeinsurance.gather()
+  brokerageaccounts.there_are_any
+  if brokerageaccounts.there_are_any:
+    brokerageaccounts.gather()
+  retirementplans.there_are_any
+  if retirementplans.there_are_any:
+    retirementplans.gather()
+  profitsharingplans.there_are_any
+  if profitsharingplans.there_are_any:
+    profitsharingplans.gather()
+  moneyowed.there_are_any
+  if moneyowed.there_are_any:
+    moneyowed.gather()
+  businesses.there_are_any
+  if businesses.there_are_any:
+    businesses.gather()
+  otherassets.there_are_any
+  if otherassets.there_are_any:
+    otherassets.gather()
+    
+  propertydivision_info4
+  studentloans.there_are_any
+  if studentloans.there_are_any:
+    studentloans.gather()
+  taxes.there_are_any
+  if taxes.there_are_any:
+    taxes.gather()
+  arrearages.there_are_any
+  if arrearages.there_are_any:
+    arrearages.gather()
+  unsecuredloans.there_are_any
+  if unsecuredloans.there_are_any:
+    unsecuredloans.gather()
+  creditcards.there_are_any
+  if creditcards.there_are_any:
+    creditcards.gather()
+  otherdebts.there_are_any
+  if otherdebts.there_are_any:
+    otherdebts.gather()
+---
+question: |
+  **Petitioner:** What is your name?
+subquestion: |
+  **Fill in your full legal name. This should match the name written on your Driver's Licence or ID.**  
+fields:
+  - First name: pet.name.first
+  - Middle name: pet.name.middle
+    required: False
+  - Last name: pet.name.last 
+  - Suffix: pet.name.suffix
+    required: False
+---
+question: |
+  **Respondent's Name:** Who is the other party in this case?
+subquestion: |
+  **Fill in your spouse's/partner's full legal name.**
+fields:
+  - First name: resp.name.first
+  - Middle name: resp.name.middle
+    required: false
+  - Last name: resp.name.last
+  - Suffix: resp.name.suffix
+    required: False
+  - Birthdate: resp.birthdate
+    datatype: ThreePartsDate  
+---
+question: |
+  **Property Division** 
+subquestion: |
+  Normally, separating couples can work out a separation of property that they both feel is fair. But remember, until a judge signs off on your agreement and issues a final order, your property and debts still belong to both of you and do not become separate even if you have agreed on how to divide them between yourselves.
+
+  When you divide your property and debt, you should come up with an agreement that divides everything fairly equally, so that you each end up with roughly the same value of your property (and debt). Dividing your property does not necessarily mean a physical division.
+
+  On the following pages, you will be asked to:
+  
+  - (1) List ALL of your and ${resp}'s assets (aka property) and debts, and 
+  - (2) Propose how you'd like to divide these assets and debts between you and ${resp} 
+  
+  A good way to start is to make a list of everything that you own. Please note that you and ${resp} must declare all assets and debts to the other. The most important thing to do is to be open and honest in listing everything of value you own. If you keep anything hidden, it tends to come to the surface sooner or later, and the penalties for hiding something of value can be very serious.  
+continue button field: propertydivision_info1
+---
+question: |
+  **Property Division:** Community vs. Separate Property 
+subquestion: |
+  In order to request property division orders, you will need to categorize each asset and debt as either community or separate property. See our [video explaining Separate vs. Community Property](link Youtube video). 
+  
+  **What is Community Property?** 
+  
+  Any property acquired between your date of marriage and date of separation is presumed to be community property (unless such property qualifies as separate property under the law), and belongs to both you and ${resp}. Community property also includes separate property that is changed to community property after marriage in compliance with the law (*read [California Family Code Section 852](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?sectionNum=852.&lawCode=FAM) on transmutation*). 
+  
+  **What is Separate Property?**
+  
+  Separate property refers to all property acquired by you or ${resp} (1) before your date of marriage; (2) after your date of separation; (3) by gift or inheritance at any time; (4) between your date of marriage and date of separation and acquired with separate property; or (5) that is initially acquired as community property but subsequently changed separate property in compliance with the law. 
+  
+  For more information, please click the following links to navigate to the California Family Code's definitions of: 
+  
+  - [Separate Property](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=FAM&sectionNum=770.); 
+  - [Community Property](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=FAM&sectionNum=760.); and
+  - [Quasi-Community Property](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=FAM&sectionNum=125.).  
+  
+  We recommend that you to read California [Family Code Sections 760-853](https://leginfo.legislature.ca.gov/faces/codes_displayexpandedbranch.xhtml?lawCode=FAM&division=4.&title=&part=2.&chapter=1.&article=&goUp=Y) regarding Characterization of Marital Property, and also [California Family Code Section 70](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?sectionNum=70.&lawCode=FAM) which defines “date of separation.” 
+continue button field: propertydivision_info2
+--- 
+question: |
+  **Property Division:** Assets
+subquestion: |
+  On the following pages, you will be asked to list and categorize each of your assets, including the following information about each: 
+  
+  **Date Acquired:** the date that you and/or ${resp} obtained ownership of the asset. 
+  
+  - If you do not know the exact date, you can list a month and year or write "before marriage," "during marriage," or "after separation." However, make sure that whatever you list makes it clear whether or not the asset or debt should be considered separate or community property. 
+  - For example, if your date of separation was July 4, 2022, you could not list "July 2022" as the date of acquisition, because this is not specific enough to determine whether the asset was acquired during the marriage or after the date of separation.  
+  
+  **Gross Fair Market Value:** the current value you estimate an asset is worth. 
+  
+  - If you don't know an asset's worth, do some research online for the same or similar assets and look for the price at which they are currently selling.
+  - When you list the current gross fair market value, please note that you must list the current value of the items (*think, how much could I get for this at a garage sale or on Craigslist?*), NOT the value that you purchased the item at or how much it would cost to replace it.  
+  
+  **Amount of Debt:** how much money is still owed on the purchase of an asset.
+  
+  - For example, if you bought a car for $11,000, but have a remaining loan of $4,000, you would write $4,000 under *Amout of Debt*.  
+  
+continue button field: propertydivision_info3
+---
+template: date_acquired
+subject: "**Date Acquired**"
+content: |
+  The date that you and/or ${resp} obtained ownership of the asset. 
+  
+  If you do not know the exact date, you can list a month and year or write "before marriage," "during marriage," or "after separation." However, make sure that whatever you list makes it clear whether or not the asset or debt should be considered separate or community property. 
+  
+  For example, if your date of separation was July 4, 2022, you could not list "July 2022" as the date of acquisition, because this is not specific enough to determine whether the asset was acquired during the marriage or after the date of separation.
+---
+template: gross_fair_market_value
+subject: "**Gross Fair Market Value**"
+content: |
+  The current value you estimate an asset is worth. 
+  
+  If you don't know an asset's worth, do some research online for the same or similar assets and look for the price at which they are currently selling.
+  
+  When you list the current gross fair market value, please note that you must list the current value of the items (*think, how much could I get for this at a garage sale or on Craigslist?*), NOT the value that you purchased the item at or how much it would cost to replace it.
+---
+template: amount_of_debt
+subject: "**Amount of Debt**"
+content: |
+  How much money is still owed on the purchase of an asset.
+  
+  For example, if you bought a car for $11,000, but have a remaining loan of $4,000, you would write $4,000 under *Amout of Debt*.
+---
+template: missing_files_explanation
+subject: "What if I can't upload the requested files right now?"
+content: |
+  Please note that if you cannot upload copies of each requested document at this time, this interview will generate instructions listing all of the documents that you must attach to your FL-160 (Property Division) forms before filing your paperwork with the court. These instructions will appear alongside the PDFs of your completed court forms at the end of the interview.
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Real Estate
+subquestion: |
+  If applicable, on the following pages, please fill in the requested information regarding each property that you and/or ${resp} own. Do NOT include any properties that you are renting. Examples of real estate include, but are not limited to: homes, condos, and raw land.    
+fields: 
+  - Do you and/or ${resp} own any real estate?: realestate.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Real Estate
+subquestion: |
+  Tell us about your and/or ${resp}'s **${ordinal(i)}** real estate property.
+fields: 
+  - Property Address: realestate[i].name.text
+  - Date Acquired: realestate[i].date
+  - Gross Fair Market Value: realestate[i].value
+    datatype: currency
+  - Amount of Debt: realestate[i].debt
+    datatype: currency
+  - Type of Property: realestate[i].type
+    choices: 
+      - Community Property: realestate[i].community
+      - ${pet}'s Separate Property: realestate[i].separate_pet
+      - ${resp}'s Separate Property: realestate[i].separate_resp
+  
+  - note: "**Upload copies of each applicable document below** (*If possible*)" 
+  - Deed: realestate[i].deed
+    datatype: file
+    required: false
+  - Latest mortgage statement: realestate[i].mortgage_statement_current
+    datatype: file
+    required: false
+  - Mortgage statement from your date of separation: realestate[i].mortgage_statement_dos
+    datatype: file
+    required: false
+  - Statements (current and date of separation) for any other loans you may have taken out on the property, such as a home equity line of credit or second mortgage: realestate[i].mortgage_loan_statements
+    datatype: files
+    required: false
+    
+  - Do you and/or ${resp} own any other real estate properties?: realestate.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Household Furniture, Furnishings, Appliances
+subquestion: |
+  In this section, you do not need to itemize and list every single piece of furniture in your home. First, make sure you list any items that are your or ${resp}'s separate property. Then, think about and list any particularly valuable items. Next, think room by room and try to group your furniture into sets (for example, "TV set," "Dining room set," or "Master bedroom set."  
+fields:
+  - Do you and/or ${resp} own any Household Furniture, Furnishings, Appliances?: furniture.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Household Furniture, Furnishings, Appliances
+subquestion: |
+  Tell us about your and/or ${resp}'s **${ordinal(i)}** valuable piece or set of household furniture, furnishings, or appliances.
+fields: 
+  - Item/Set: furniture[i].name.text
+  - Date Acquired: furniture[i].date
+  - Gross Fair Market Value: furniture[i].value
+    datatype: currency
+  - note: "Remember, when you list an item's gross fair market value, you must list the current value of the items (*think, how much could I get for this at a garage sale or on Craigslist?*), NOT the value at which you purchased the item or the cost of replacing it."
+  - Amount of Debt: furniture[i].debt
+    datatype: currency
+  - Type of Property: furniture[i].type
+    choices: 
+      - Community Property: furniture[i].community
+      - ${pet}'s Separate Property: furniture[i].separate_pet
+      - ${resp}'s Separate Property: furniture[i].separate_resp
+  
+  - Do you and/or ${resp} own any other pieces or sets of household furniture, furnishings, or appliances?: furniture.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Jewelry, Antiques, Art, Coin Collections, etc.
+subquestion: |
+  If you and/or your ${resp} own these items or other collectibles worth more than $500, list them on the following page. Please note that any items given as gifts (such as engagement rings, wedding rings, or other jewelry) both during and outside of the marriage should be the separate property of the recipient (the person to whom they were given).
+fields:
+  - People generally own these types of personal items at a nominal value. Do you and/or ${resp} own any jewelry, antiques, art collections, or other collectibles worth more than $500?: collectibles.there_are_any
+    datatype: yesnoradio
+    label above field: true
+  - Check here if you do own these types of personal items at a nominal value (i.e. you have these items but they're worth less than $500): jewelry_nominal_value 
+    datatype: yesnowide
+    show if: 
+      variable: collectibles.there_are_any
+      is: false
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Jewelry, Antiques, Art, Coin Collections, etc.
+subquestion: |
+  Tell us about your and/or ${resp}'s **${ordinal(i)}** piece/set of jewelry, antiques, art, coin collections, or other collectibles.
+fields: 
+  - Item/Set: collectibles[i].name.text
+  - Date Acquired: collectibles[i].date
+  - Gross Fair Market Value: collectibles[i].value
+    datatype: currency
+  - Amount of Debt: collectibles[i].debt
+    datatype: currency
+  - Type of Property: collectibles[i].type
+    choices: 
+      - Community Property: collectibles[i].community
+      - ${pet}'s Separate Property: collectibles[i].separate_pet
+      - ${resp}'s Separate Property: collectibles[i].separate_resp
+  
+  - Do you and/or ${resp} own any other pieces or sets of jewelry, antiques, art, coin collections, or other collectibles?: collectibles.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Property Division, Assets:** Vehicles, Boats, Trailers
+subquestion: |
+  If you and/or ${resp} own any vehicles (such as cars), boats, or trailers, please list them on the following page alongside their year, make, model, license plate number (*if applicable*), and who has possession of the vehicle. You will need to attach copies of any title documents or statements (both current and from your date of separation) for any loans/amounts owed on the vehicle. 
+fields:  
+  - Do you and/or ${resp} own any vehicles, boats, or trailers?: vehicles.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Vehicles, Boats, Trailers
+subquestion: |
+  Tell us about your and/or ${resp}'s **${ordinal(i)}** vehicle, boat, or trailer.
+fields: 
+  - Fill in the year, make, model, license plate number, and who has possession of the vehicle: vehicles[i].name.text
+    help: |
+      For example: 2017 Toyota Camry LE #123ABC (Currently driven by ${resp})
+  - Date Acquired: vehicles[i].date
+  - Gross Fair Market Value: vehicles[i].value
+    datatype: currency
+  - Amount of Debt: vehicles[i].debt
+    datatype: currency
+  - Type of Property: vehicles[i].type
+    choices: 
+      - Community Property: vehicles[i].community
+      - ${pet}'s Separate Property: vehicles[i].separate_pet
+      - ${resp}'s Separate Property: vehicles[i].separate_resp
+    
+  - note: "**Upload copies of each applicable document below** (*If possible*)" 
+  - Title: vehicles[i].title
+    datatype: file
+    required: false
+  - If applicable, latest car loan statement: vehicles[i].carloan_statement_current
+    datatype: file
+    required: false
+  - If applicable, car loan statement from your date of separation: vehicles[i].carloan_statement_dos
+    datatype: file
+    required: false 
+  
+  - Do you and/or ${resp} own any other vehicles, boats, or trailers?: vehicles.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Savings Accounts
+subquestion: |
+  If you and/or ${resp} have any savings accounts, you'll need to list all accounts, whether held jointly or separately. Make sure to indicate if there is a joint account which only one party (you or ${resp}) has been using since your date of separation. For each account, you'll need to attach a current statement and a statement from your date of separation. 
+fields: 
+  - Do you and/or ${resp} have any savings accounts?: savingsaccounts.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Property Division, Assets:** Savings Accounts
+subquestion: |
+  Tell us about your and/or ${resp}'s **${ordinal(i)}** savings account.
+fields: 
+  - Account Number (last 4 digits) and Financial Institution's Name: savingsaccounts[i].name.text
+    help: |
+      For example: Chase (#1234), used solely by ${pet} since Date of Separation
+  - Date Acquired: savingsaccounts[i].date
+  - Gross Fair Market Value: savingsaccounts[i].value
+    datatype: currency
+  - Amount of Debt: savingsaccounts[i].debt
+    datatype: currency
+  - Type of Property: savingsaccounts[i].type
+    choices: 
+      - Community Property: savingsaccounts[i].community
+      - ${pet}'s Separate Property: savingsaccounts[i].separate_pet
+      - ${resp}'s Separate Property: savingsaccounts[i].separate_resp
+  
+  - note: "**Upload copies of each applicable document below** (*If possible*)" 
+  - Latest statement: savingsaccounts[i].statement_current
+    datatype: file
+    required: false
+  - Statement from your date of separation: savingsaccounts[i].statement_dos
+    datatype: file
+    required: false 
+  
+  - Do you and/or ${resp} have any other savings accounts?: savingsaccounts.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Checking Accounts
+subquestion: |
+  If you and/or ${resp} have any checking accounts, you'll need to list all accounts, whether held jointly or separately. Make sure to indicate if there is a joint account which only one party (you or ${resp}) has been using since your date of separation. For each account, you'll need to attach a current statement and a statement from your date of separation. 
+fields: 
+  - Do you and/or ${resp} have any checking accounts?: checkingaccounts.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Checking Accounts
+subquestion: |
+  Tell us about your and/or ${resp}'s **${ordinal(i)}** checking account.
+fields: 
+  - Account Number (last 4 digits) and Financial Institution's Name: checkingaccounts[i].name.text
+    help: |
+      For example: Chase (#1234), used solely by ${pet} since Date of Separation
+  - Date Acquired: checkingaccounts[i].date
+  - Gross Fair Market Value: checkingaccounts[i].value
+    datatype: currency
+  - Amount of Debt: checkingaccounts[i].debt
+    datatype: currency
+  - Type of Property: checkingaccounts[i].type
+    choices: 
+      - Community Property: checkingaccounts[i].community
+      - ${pet}'s Separate Property: checkingaccounts[i].separate_pet
+      - ${resp}'s Separate Property: checkingaccounts[i].separate_resp
+  
+  - note: "**Upload copies of each applicable document below** (*If possible*)" 
+  - Latest statement: checkingaccounts[i].statement_current
+    datatype: file
+    required: false
+  - Statement from your date of separation: checkingaccounts[i].statement_dos
+    datatype: file
+    required: false 
+  
+  - Do you and/or ${resp} have any other checking accounts?: checkingaccounts.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Credit Union, Other Depository Accounts
+subquestion: |
+  If you and/or ${resp} have any credit union or other depository accounts, you'll need to list all accounts, whether held jointly or separately. Make sure to indicate if there is a joint account which only one party (you or ${resp}) has been using since your date of separation. For each account, you'll need to attach a current statement and a statement from your date of separation. 
+fields: 
+  - Do you and/or ${resp} have any credit union or ther depository accounts?: creditunion.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Credit Union, Other Depository Accounts
+subquestion: |
+  Tell us about your and/or ${resp}'s **${ordinal(i)}** credit union or other depository account.
+fields: 
+  - Account Number (last 4 digits) and Financial Institution's Name: creditunion[i].name.text
+    help: |
+      For example: Chase (#1234), used solely by ${pet} since Date of Separation
+  - Date Acquired: creditunion[i].date
+  - Gross Fair Market Value: creditunion[i].value
+    datatype: currency
+  - Amount of Debt: creditunion[i].debt
+    datatype: currency
+  - Type of Property: creditunion[i].type
+    choices: 
+      - Community Property: creditunion[i].community
+      - ${pet}'s Separate Property: creditunion[i].separate_pet
+      - ${resp}'s Separate Property: creditunion[i].separate_resp
+    
+	- note: "**Upload copies of each applicable document below** (*If possible*)" 
+	- Latest statement: creditunion[i].statement_current
+	  datatype: file
+    required: false
+	- Statement from your date of separation: creditunion[i].statement_dos
+    datatype: file
+    required: false
+
+  - Do you and/or ${resp} have any other credit union or ther depository accounts?: creditunion.there_is_another
+    datatype: yesnoradio
+  
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Cash
+subquestion: |
+  Generally, people only carry or have a nominal amount of cash. However, if there is a large sum of cash in a safe deposit box or other location, please list each amount and location on the following page. 
+fields:
+  - Do you and/or ${resp} have one or more sums of cash worth more than $500?: cash.there_are_any
+    datatype: yesnoradio
+    label above field: true
+  - Check here if you or ${resp} do have cash, but at a nominal value (i.e. you have less than $500 in cash): cash_nominal_value 
+    datatype: yesnowide
+    show if: 
+      variable: cash.there_are_any
+      is: false
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Cash
+subquestion: |
+  Tell us about your and/or ${resp}'s **${ordinal(i)}** sum of cash worth more than $500.
+
+fields: 
+  - Amount and Location: cash[i].name.text
+    help: |
+      For example: $2,000 in BoA Safe Deposit Box 
+  - Date Acquired: cash[i].date
+  - Amount: cash[i].value
+    datatype: currency
+  - Type of Property: cash[i].type
+    choices: 
+      - Community Property: cash[i].community
+      - ${pet}'s Separate Property: cash[i].separate_pet
+      - ${resp}'s Separate Property: cash[i].separate_resp
+    
+	- If applicable, upload copies of any documents demonstrating the amount and/or location of the cash: cash[i].statement_current
+	  datatype: file
+    required: false
+  
+  - Do you and/or ${resp} have any more sums of cash worth more than $500?: cash.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Tax Refund
+subquestion: |
+  If there is a dispute between you and ${resp} over how a tax refund should be allocated, please write the details on the following page.
+fields: 
+  - Are you and/or ${resp} currently owed one or more tax refunds?: taxrefund.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Tax Refund
+subquestion: |
+  Tell us about your and/or ${resp}'s **${ordinal(i)}** tax refund.
+fields: 
+  - Fill in the tax refund's fiscal year and whether or not there is a dispute over how it should be allocated: taxrefund[i].name.text
+    help: |
+      For example: 2019 Tax Refund 
+  - Date Acquired: taxrefund[i].date
+  - Amount to be refunded: taxrefund[i].value
+    datatype: currency
+  - Type of Property: taxrefund[i].type
+    choices: 
+      - Community Property: taxrefund[i].community 
+      - ${pet}'s Separate Property: taxrefund[i].separate_pet
+      - ${resp}'s Separate Property: taxrefund[i].separate_resp
+    
+  - If there is a dispute over how a tax refund should be allocated, write the details here: taxrefund[i].file
+    input type: area
+  
+  - Do you and/or ${resp} have any more tax refunds?: taxrefund.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Life Insurance Policy with Cash Surrender or Loan Value 
+subquestion: |
+  If you or ${resp} holds a life insurance policy with a cash-out value (this generally only applies to whole life policies), please list each policy on the next page and attach a copy of each policy's declaration page and most recent policy statement. Include any term policies, making sure to indicate that they are term policies.
+fields: 
+  - Do you and/or ${resp} have any life insurance policies with cash surrender or loan value?: lifeinsurance.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Life Insurance with Cash Surrender or Loan Value
+subquestion: |
+  Tell us about your and/or ${resp}'s **${ordinal(i)}** life insurance policy with cash surrender or loan value.
+fields: 
+  - Institution Name and Policy Number (last 4 digits): lifeinsurance[i].name.text 
+  - Date Acquired: lifeinsurance[i].date
+  - Gross Fair Market Value: lifeinsurance[i].value
+    datatype: currency
+  - Amount of Debt: lifeinsurance[i].debt
+    datatype: currency
+  - Type of Property: lifeinsurance[i].type
+    choices: 
+      - Community Property: lifeinsurance[i].community
+      - ${pet}'s Separate Property: lifeinsurance[i].separate_pet
+      - ${resp}'s Separate Property: lifeinsurance[i].separate_resp 
+  
+  - note: "**Upload copies of each applicable document below** (*If possible*)" 
+	- Policy declaration page: lifeinsurance[i].policy_declaration_page
+    datatype: file
+    required: false
+  - Latest policy statement: lifeinsurance[i].statement_current
+	  datatype: file
+    required: false
+
+  - Do you and/or ${resp} have any more life insurance policies with cash surrender or loan value?: lifeinsurance.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Stocks, Bonds, Secured Notes, Mutual Funds
+subquestion: |
+  If you and/or ${resp} hold any brokerage or investment accounts (*for example, Schwab, Edward Jones, Wachovia, etc.*), please list each account on the next page. You will also need to attach current and date of separation statements for each account. Do not include 401(k)s or IRAs here, as you'll be asked about these in the following pages. 
+fields: 
+  - Do you and/or ${resp} have any brokerage or investment accounts?: brokerageaccounts.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Stocks, Bonds, Secured Notes, Mutual Funds
+subquestion: |
+  Tell us about your or ${resp}'s **${ordinal(i)}** brokerage or investment account.
+fields: 
+  - Institution Name and Account Number (last 4 digits): brokerageaccounts[i].name.text 
+  - Date Acquired: brokerageaccounts[i].date
+  - Gross Fair Market Value: brokerageaccounts[i].value
+    datatype: currency
+  - Amount of Debt: brokerageaccounts[i].debt
+    datatype: currency
+  - Type of Property: brokerageaccounts[i].type
+    choices: 
+      - Community Property: brokerageaccounts[i].community
+      - ${pet}'s Separate Property: brokerageaccounts[i].separate_pet
+      - ${resp}'s Separate Property: brokerageaccounts[i].separate_resp
+    
+  - note: "**Upload copies of each applicable document below** (*If possible*)" 
+	- Latest statement: brokerageaccounts[i].statement_current
+	  datatype: file
+    required: false
+	- Statement from your date of separation: brokerageaccounts[i].statement_dos
+    datatype: file
+    required: false
+  
+  - Do you and/or ${resp} have any more brokerage or investment accounts?: brokerageaccounts.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Retirement and Pensions
+subquestion: |
+  If you and/or ${resp} have any retirement plans, whether defined-contribution plans, such as company-administered 401(k)s, or defined-benefit plans, such as CalPERS, STRA, or private entity pensions, please list them on the next page. You'll also need to attach summary plan documents, current statements, and date of separation statements, as well as indicate when you started and ended credited service in any employer sponsored plan.
+fields: 
+  - Do you and/or ${resp} have any retirement plans (not including IRAs), whether defined-contribution plans or defined-benefit plans?: retirementplans.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Retirement and Pensions
+subquestion: |
+  Tell us about your or ${resp}'s **${ordinal(i)}** retirement plan (not including IRAs).
+fields: 
+  - Fill in the plan type, institution name (*if applicable*), plan number (last 4 digits), and the dates you started and ended credited service in any employer sponsored plan (*if applicable*): retirementplans[i].name.text 
+    help: |
+      For example: 401(k) Plan (#1234), Employer Credited Service from 1/1/2017 to 4/5/2021
+  - Date Acquired: retirementplans[i].date
+  - Gross Fair Market Value: retirementplans[i].value
+    datatype: currency
+  - Amount of Debt: retirementplans[i].debt
+    datatype: currency
+  - Type of Property: retirementplans[i].type
+    choices: 
+      - Community Property: retirementplans[i].community
+      - ${pet}'s Separate Property: retirementplans[i].separate_pet
+      - ${resp}'s Separate Property: retirementplans[i].separate_resp 
+  
+  - note: "**Upload copies of each applicable document below** (*If possible*)" 
+	- Summary plan documents: retirementplans[i].summary_plan_documents
+    datatype: files
+    required: false
+  - Latest statement: retirementplans[i].statement_current
+	  datatype: file
+    required: false
+	- Statement from your date of separation: retirementplans[i].statement_dos
+    datatype: file
+    required: false
+  
+  - Do you and/or ${resp} have any more retirement plans (not including IRAs), whether defined-contribution plans or defined-benefit plans?: retirementplans.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Profit-Sharing, IRAs, Deferred Compensation, Annuities
+subquesion: |
+  If you and/or ${resp} have any profit-sharing, IRA, or Defferred Comensation Plans or Annuities, please list them on the next page. You'll also need to attach current and date of separation statements. Make sure to indicate if you began contributing to any such plan prior to your mariage.
+fields: 
+  - Do you and/or ${resp} have any profit-sharing, IRA, or Deferred Compensation Plans or Annuities?: profitsharingplans.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Profit-Sharing, IRAs, Deferred Compensation, Annuities
+subquestion: |
+  Tell us about your or ${resp}'s **${ordinal(i)}** profit-sharing, IRA, deferred compensation plan or annuity.
+fields: 
+  - Fill in the plan type, institution name, and plan number (last 4 digits): profitsharingplans[i].name.text 
+    help: |
+      For example: Transamerican Roth IRA (#1234)
+  - Date Acquired: profitsharingplans[i].date
+  - Gross Fair Market Value: profitsharingplans[i].value
+    datatype: currency
+  - Amount of Debt: profitsharingplans[i].debt
+    datatype: currency
+  - Type of Property: profitsharingplans[i].type
+    choices: 
+      - Community Property: profitsharingplans[i].community
+      - ${pet}'s Separate Property: profitsharingplans[i].separate_pet
+      - ${resp}'s Separate Property: profitsharingplans[i].separate_resp
+  
+  - note: "**Upload copies of each applicable document below** (*If possible*)" 
+	- Latest statement: profitsharingplans[i].statement_current
+	  datatype: file
+    required: false
+	- Statement from your date of separation: profitsharingplans[i].statement_dos
+    datatype: file
+    required: false
+  
+  - Do you and/or ${resp} have any more profit-sharing, IRA, or Deferred Compensation Plans or Annuities?: profitsharingplans.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Accounts Receivable, Unsecured Notes
+subquestion: |
+  If you and/or ${resp} have any accounts receivable, unsecured notes, or other money owed to you by third parties, please list information about each on the next page. This most commonly includes receivables related to businesses you or ${resp} operate, or promissory notes for money loaned by you or ${resp} to a third party. You'll also need to attach copies of any applicable documents, e.g., promissory note, IOU, letter/email/text by the third party stating he/she owes you the money.
+fields: 
+  - Do you and/or ${resp} have any accounts receivable, unsecured notes, or other money owed to you by third parties?: moneyowed.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Accounts Receivable, Unsecured Notes
+subquestion: |
+  Tell us about the **${ordinal(i)}** unsecured note, account receivable, or third-party debt owed to you and/or ${resp}.
+fields: 
+  - Description: moneyowed[i].name.text 
+  - Date Acquired: moneyowed[i].date
+  - Amount owed to you and/or ${resp}: moneyowed[i].value
+    datatype: currency
+  - Type of Property: moneyowed[i].type
+    choices: 
+      - Community Property: moneyowed[i].community
+      - ${pet}'s Separate Property: moneyowed[i].separate_pet
+      - ${resp}'s Separate Property: moneyowed[i].separate_resp
+  
+  - Upload any applicable documents (for example, apromissory note, IOU, letter/text/email, etc.) by the third party stating he or she owes you the money: moneyowed[i].applicable_documents
+    datatype: files
+    required: false
+  
+  - Are there any more unsecured notes, account receivables, or third-party debts owed to you and/or ${resp}: moneyowed.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Partnerships, Other Business Interests
+subquestion: |
+  If you and/or ${resp} own any businesses, partially or fully, please list them on the next page. You'll also need to attach copies of the partnership/business agreement between you and your partners/other interest holders, as well as your most recent K-1 and Schedule C forms from the last 3 years. If you maintain profit and loss statements, please include the most recent yearly, quarterly and monthly reports. 
+fields: 
+  - Do you and/or ${resp} own any businesses, whether partially or fully?: businesses.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Partnerships, Other Business Interests
+subquestion: |
+  Tell us about the **${ordinal(i)}** business that you and/or ${resp} own.
+fields: 
+  - Business Name: businesses[i].name.text 
+  - Date Acquired: businesses[i].date
+  - Gross Fair Market Value: businesses[i].value
+    datatype: currency
+  - Type of Property: businesses[i].type
+    choices: 
+      - Community Property: businesses[i].community
+      - ${pet}'s Separate Property: businesses[i].separate_pet
+      - ${resp}'s Separate Property: businesses[i].separate_resp
+  
+  - note: "**Upload copies of each applicable document below** (*If possible*)" 
+	- Partnership/business agreement between you and your partners/other interest holders: businesses[i].partnership_documents
+	  datatype: files
+    required: false
+	- Most recent K-1 and Schedule-C forms (last 3 years): businesses[i].k1_and_schedulec
+    datatype: files
+    required: false
+  - Profit and loss statements (if maintained) : businesses[i].pandl
+	  datatype: files
+    required: false
+	- Most recent yearly, quarterly, and/or monthly reports (if maintained): businesses[i].reports
+    datatype: files
+    required: false
+  
+  - Do you and/or ${resp} own any other businesses: businesses.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Other Assets
+subquestion: |
+  If you and/or ${resp} own any other assets that do not fit into any of the previous categories, please list them on the next page.
+fields: 
+  - Do you and/or ${resp} own any other assets that do not fit into any of the previous categories?: otherassets.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Assets:** Other Assets
+subquestion: |
+  Tell us about the **${ordinal(i)}** other asset.
+fields: 
+  - Description: otherassets[i].name.text 
+  - Date Acquired: otherassets[i].date
+  - Gross Fair Market Value: otherassets[i].value
+    datatype: currency
+  - Type of Property: otherassets[i].type
+    choices: 
+      - Community Property: otherassets[i].community
+      - ${pet}'s Separate Property: otherassets[i].separate_pet
+      - ${resp}'s Separate Property: otherassets[i].separate_resp
+  
+  - If possible, upload any applicable documents (for example, statements, valuations, etc.) demonstrating this asset's value and amount of debt: otherassets[i].applicable_documents
+    datatype: files
+    required: false
+  
+  - Are you and/or ${resp} own any other assets that don't fit into any of the previous categories?: otherassets.there_is_another
+    datatype: yesnoradio
+#### end of assets question blocks
+---
+#### start of debts question blocks
+template: to_whom_owed
+subject: "**To Whom Owed**"
+content: |
+  Identify the third party (person or institution) to whom the debt is owed.
+---
+template: date_incurred
+subject: "**Date Incurred**"
+content: |
+  Write the date that you and/or ${resp.name.first} incurred the debt. If you do not know the exact date, you can list a month and year or write "before marriage," "during marriage," or "after separation." However, make sure that whatever you list makes it clear whether or not the debt should be considered separate or community property in line with state definitions.  
+---
+question: |
+  **Your and ${resp.name.first}'s Debts**
+subquestion: |
+  On the following pages, you will be asked to list and categorize each of your debts, including the following information about each: 
+  
+  **To whom owed:** 
+  
+  Identify the third party (person or institution) to whom the debt is owed. Be sure to attach documents, if any exist, that establish the existence of the debt and how much is owed.  
+  
+  **Date incurred:** 
+  
+  Write the date that you and/or ${resp} incurred the debt. If you do not know the exact date, you can list a month and year or write "before marriage," "during marriage," or "after separation." However, make sure that whatever you list makes it clear whether or not the debt should be considered separate or community property in line with state definitions.   
+continue button field: propertydivision_info4
+---
+question: |
+  **Your and ${resp.name.first}'s Debts:** Student Loans
+subquestion: |
+  If you or ${resp} have any outstanding student loans (student loans that you haven't paid off yet), please list them on the next page. You'll also need to attach current and date of separation statements. Please note that student loans are an exception to the community vs. separate property rule, as student loans taken out at any point, even during the marriage, are considered the debtor's separate property.
+fields: 
+  - Do you or ${resp} have any student loans?: studentloans.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Debts:** Student Loans
+subquestion: |
+  Tell us about your or ${resp}'s **${ordinal(i)}** student loan.
+fields: 
+  - To Whom Owed: studentloans[i].name.text
+  - Date Incurred: studentloans[i].date
+  - Total Owed: studentloans[i].amount
+    datatype: currency
+  
+  - note: "**Upload copies of each applicable document below** (*If possible*)" 
+	- Latest statement: studentloans[i].statement_current
+	  datatype: file
+    required: false
+	- Statement from your date of separation: studentloans[i].statement_dos
+    datatype: file
+    required: false
+  - Type of Property: studentloans[i].type
+    choices: 
+      - ${pet}'s Separate Property: studentloans[i].separate_pet
+      - ${resp}'s Separate Property: studentloans[i].separate_resp
+  
+  - Do you or ${resp} have any other student loans: studentloans.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Debts:** Taxes
+subquestion: |
+  If you or ${resp} have any outstanding taxes (taxes that you still owe), whether local, state, or federal, please list them on the next page.
+fields: 
+  - Do you or ${resp} have any outstanding taxes?: taxes.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Debts:** Taxes
+subquestion: |
+  Tell us about your or ${resp}'s **${ordinal(i)}** tax debt.
+fields: 
+  - To Whom Owed: taxes[i].name.text
+  - Date Incurred: taxes[i].date
+  - Total Owed: taxes[i].amount
+    datatype: currency
+  - Type of Property: taxes[i].type
+    choices: 
+      - Community Property: taxes[i].community
+      - ${pet}'s Separate Property: taxes[i].separate_pet
+      - ${resp}'s Separate Property: taxes[i].separate_resp 
+  
+  - If possible, upload any documents that provide information on any outstanding taxes, whether state, federal, or local: taxes[i].applicable_documents
+    datatype: files
+    required: false
+  
+  - Do you or ${resp} have any other tax debts?: taxes.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Debts:** Support Arrearages
+subquestion: |
+  If you or ${resp} owe any past-due child or spousal support payments (aka arrearages), whether court-ordered or informal, please list them on the next page.
+fields: 
+  - Do you or ${resp} owe any past-due child or spousal support payments?: arrearages.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Debts:** Support Arrearages
+subquestion: |
+  Tell us about your or ${resp}'s **${ordinal(i)}** arrearage (past-due support payment).
+fields: 
+  - To Whom Owed: arrearages[i].name.text
+  - Date Incurred: arrearages[i].date
+  - Total Owed: arrearages[i].amount
+    datatype: currency
+  - Type of Property: arrearages[i].type
+    choices: 
+      - Community Property
+      - ${pet}'s Separate Property
+      - ${resp}'s Separate Property
+  
+  - If possible, upload any documents (such as a wage garnishment orincome withholding order) that provide information on any past-due child support or spousal support obligations/payments for court-ordered or informal support: arrearages[i].applicable_documents
+    datatype: files
+    required: false
+  
+  - Do you or ${resp} owe any other arrearages (past-due support payments)?: arrearages.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Debts:** Unsecured Loans
+subquestion: |
+  If you and/or ${resp} have taken out any unsecured loans, please list them on the next page (*do not list car loans or home mortgages here, but rather in their sections on previous pages*). You'll also need to attach copies of loan documents, and current and date of separation statements.
+  
+  These types of loans are typically made on a personal basis, such as a loan from a friend or family member or by a financial institution.   
+fields: 
+  - Do you or ${resp} owe unsecured loans?: unsecuredloans.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Debts:** Unsecured Loans
+subquestion: |
+  Tell us about your or ${resp}'s **${ordinal(i)}** unsecured loan.
+fields: 
+  - To Whom Owed: unsecuredloans[i].name.text
+  - Date Incurred: unsecuredloans[i].date
+  - Total Owed: unsecuredloans[i].amount
+    datatype: currency
+  - Type of Property: unsecuredloans[i].type
+    choices: 
+      - Community Property: unsecuredloans[i].community
+      - ${pet}'s Separate Property: separate_pet
+      - ${resp}'s Separate Property: unsecuredloans[i].separate_resp
+  
+  - note: "**Upload copies of each applicable document below** (*If possible*)" 
+	- Applicable loan documents: unsecuredloans[i].amount
+    datatype: files
+    required: false
+  - Latest statement: unsecuredloans[i].statement_current
+	  datatype: file
+    required: false
+	- Statement from your date of separation: unsecuredloans[i].statement_dos
+    datatype: file
+    required: false
+  - Do you or ${resp} owe any other unsecured loans?: unsecuredloans.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Debts:** Credit Cards
+subquestion: |
+  If you and/or ${resp} have any credit card debts, please list them on the next page. 
+fields: 
+  - Do you or ${resp} owe any credit card debts?: creditcards.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Debts:** Credit Cards
+subquestion: |
+  Tell us about your or ${resp}'s **${ordinal(i)}** credit card debt.
+fields: 
+  - To Whom Owed: creditcards[i].name.text
+  - Date Incurred: creditcards[i].date
+  - Total Owed: creditcards[i].amount
+    datatype: currency
+  - Type of Property: creditcards[i].type
+    choices: 
+      - Community Property: creditcards[i].community
+      - ${pet}'s Separate Property: creditcards[i].separate_pet
+      - ${resp}'s Separate Property: creditcards[i].separate_resp
+  
+  - note: "**Upload copies of each applicable document below** (*If possible*)" 
+	- Latest statement: creditcards[i].statement_current
+	  datatype: file
+    required: false
+	- Statement from your date of separation: creditcards[i].statement_dos
+    datatype: file
+    required: false
+  
+  - Do you or ${resp} owe any other credit card debts?: creditcards.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Debts:** Other Debts
+subquestion: |
+  If you and/or ${resp} have any other debts that don't fit into any of the previous categories, please list them on the next page 
+fields: 
+  - Do you or ${resp} owe any other debts?: otherdebts.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  **Your and ${resp.name.first}'s Debts:** Credit Cards
+subquestion: |
+  Tell us about your or ${resp}'s **${ordinal(i)}** other debt.
+fields: 
+  - To Whom Owed: otherdebts[i].name.text
+  - Date Incurred: otherdebts[i].date
+  - Total Owed: otherdebts[i].amount
+    datatype: currency
+  - Type of Property: otherdebts[i].type
+    choices: 
+      - Community Property: otherdebts[i].community
+      - ${pet}'s Separate Property: otherdebts[i].separate_pet
+      - ${resp}'s Separate Property: otherdebts[i].separate_resp
+  
+  - If possible, upload any applicable documents (such as current and date of separation statements) demonstrating the amount and ownership of the debt: otherdebts[i].applicable_documents
+    datatype: files
+    required: false
+  
+  - Do you or ${resp} owe any other additional debts?: otherdebts.there_is_another
+    datatype: yesnoradio
+---
