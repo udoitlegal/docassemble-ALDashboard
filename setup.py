@@ -46,7 +46,7 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
 setup(name='docassemble.ALDashboard',
       version='0.0.1',
       description=("Note that I omitted the 'under' templates that define community vs. separate property in each of the asset/debt info gathering question blocks"),
-      long_description="# docassemble.ALDashboard\n\nNote that I omitted the 'under' templates that define community vs. separate property in each of the asset/debt info gathering question blocks\n\n## Author\n\nSystem Administrator, kcrabtree@udoitlegal.com\n\n",
+      long_description="# docassemble.ALDashboard\r\n\r\nNote that I omitted the 'under' templates that define community vs. separate property in each of the asset/debt info gathering question blocks\r\n\r\n## Author\r\n\r\nSystem Administrator, kcrabtree@udoitlegal.com\r\n\r\n",
       long_description_content_type='text/markdown',
       author='System Administrator',
       author_email='kcrabtree@udoitlegal.com',

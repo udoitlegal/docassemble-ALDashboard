@@ -973,7 +973,7 @@ fields:
       - ${resp}'s Separate Property: unsecuredloans[i].separate_resp
   
   - note: "**Upload copies of each applicable document below** (*If possible*)" 
-	- Applicable loan documents: unsecuredloans[i].amount
+	- Applicable loan documents: unsecuredloans[i].applicable_documents
     datatype: files
     required: false
   - Latest statement: unsecuredloans[i].statement_current
